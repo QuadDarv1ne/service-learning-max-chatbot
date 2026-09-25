@@ -171,3 +171,73 @@
   }
 }
 
+/* ============================================================
+   Адаптация пастельных Tailwind-плашек к тёмной и синей темам.
+   Светлые фоны (bg-*-50/100) заменяются на полупрозрачные оттенки,
+   тёмные тексты (text-*-700/800) — на светлые, чтобы сохранить
+   читаемость и не слепить глаза. Солидные акценты (*-500) не трогаем.
+   ============================================================ */
+.dark .bg-red-50,
+.dark .bg-red-50\/50,
+.blue .bg-red-50,
+.blue .bg-red-50\/50 { background-color: rgba(255, 99, 105, 0.12); }
+.dark .bg-red-100, .blue .bg-red-100 { background-color: rgba(255, 99, 105, 0.18); }
+.dark .border-red-200, .blue .border-red-200 { border-color: rgba(255, 99, 105, 0.28); }
+.dark .border-red-300, .blue .border-red-300 { border-color: rgba(255, 99, 105, 0.4); }
+.dark .text-red-600, .blue .text-red-600 { color: #ff8f93; }
+.dark .text-red-700, .blue .text-red-700 { color: #ffa8ac; }
+.dark .text-red-800, .blue .text-red-800 { color: #ffbcc0; }
+
+.dark .bg-blue-50, .blue .bg-blue-50 { background-color: rgba(59, 155, 255, 0.12); }
+.dark .bg-blue-100, .blue .bg-blue-100 { background-color: rgba(59, 155, 255, 0.18); }
+.dark .border-blue-200, .blue .border-blue-200 { border-color: rgba(59, 155, 255, 0.28); }
+.dark .border-blue-300, .blue .border-blue-300 { border-color: rgba(59, 155, 255, 0.4); }
+.dark .text-blue-700, .blue .text-blue-700 { color: #a9d1ff; }
+.dark .text-blue-800, .blue .text-blue-800 { color: #bfdcff; }
+
+.dark .bg-green-50, .blue .bg-green-50 { background-color: rgba(70, 200, 120, 0.12); }
+.dark .bg-green-100, .blue .bg-green-100 { background-color: rgba(70, 200, 120, 0.18); }
+.dark .border-green-200, .blue .border-green-200 { border-color: rgba(70, 200, 120, 0.28); }
+.dark .border-green-300, .blue .border-green-300 { border-color: rgba(70, 200, 120, 0.4); }
+.dark .text-green-700, .blue .text-green-700 { color: #a8e6bf; }
+.dark .text-green-800, .blue .text-green-800 { color: #bcedcd; }
+
+.dark .bg-amber-50, .blue .bg-amber-50 { background-color: rgba(255, 190, 70, 0.13); }
+.dark .bg-amber-100, .blue .bg-amber-100 { background-color: rgba(255, 190, 70, 0.19); }
+.dark .border-amber-200, .blue .border-amber-200 { border-color: rgba(255, 190, 70, 0.3); }
+.dark .border-amber-300, .blue .border-amber-300 { border-color: rgba(255, 190, 70, 0.42); }
+.dark .text-amber-600, .blue .text-amber-600 { color: #ffcb72; }
+.dark .text-amber-700, .blue .text-amber-700 { color: #ffd9a0; }
+.dark .text-amber-800, .blue .text-amber-800 { color: #ffe3b8; }
+
+.dark .bg-violet-50, .blue .bg-violet-50 { background-color: rgba(160, 120, 255, 0.14); }
+.dark .bg-violet-100, .blue .bg-violet-100 { background-color: rgba(160, 120, 255, 0.2); }
+.dark .border-violet-200, .blue .border-violet-200 { border-color: rgba(160, 120, 255, 0.3); }
+.dark .border-violet-300, .blue .border-violet-300 { border-color: rgba(160, 120, 255, 0.42); }
+.dark .text-violet-700, .blue .text-violet-700 { color: #d3c2ff; }
+.dark .text-violet-800, .blue .text-violet-800 { color: #e0d4ff; }
+
+.dark .bg-purple-50, .blue .bg-purple-50 { background-color: rgba(160, 120, 255, 0.14); }
+.dark .bg-purple-100, .blue .bg-purple-100 { background-color: rgba(160, 120, 255, 0.2); }
+.dark .text-purple-700, .blue .text-purple-700 { color: #d3c2ff; }
+
+.dark .bg-sky-50, .blue .bg-sky-50 { background-color: rgba(80, 190, 235, 0.13); }
+.dark .bg-sky-100, .blue .bg-sky-100 { background-color: rgba(80, 190, 235, 0.19); }
+.dark .border-sky-200, .blue .border-sky-200 { border-color: rgba(80, 190, 235, 0.3); }
+.dark .border-sky-300, .blue .border-sky-300 { border-color: rgba(80, 190, 235, 0.42); }
+.dark .text-sky-700, .blue .text-sky-700 { color: #a8e2f5; }
+.dark .text-sky-800, .blue .text-sky-800 { color: #c2ecfa; }
+
+.dark .bg-rose-50, .blue .bg-rose-50 { background-color: rgba(255, 110, 150, 0.13); }
+.dark .bg-rose-100, .blue .bg-rose-100 { background-color: rgba(255, 110, 150, 0.19); }
+.dark .border-rose-200, .blue .border-rose-200 { border-color: rgba(255, 110, 150, 0.3); }
+.dark .border-rose-300, .blue .border-rose-300 { border-color: rgba(255, 110, 150, 0.42); }
+.dark .text-rose-700, .blue .text-rose-700 { color: #ffb8cd; }
+.dark .text-rose-800, .blue .text-rose-800 { color: #ffcbdb; }
+
+.dark .bg-indigo-50, .blue .bg-indigo-50 { background-color: rgba(120, 130, 255, 0.14); }
+.dark .bg-indigo-100, .blue .bg-indigo-100 { background-color: rgba(120, 130, 255, 0.2); }
+.dark .border-indigo-200, .blue .border-indigo-200 { border-color: rgba(120, 130, 255, 0.3); }
+.dark .text-indigo-700, .blue .text-indigo-700 { color: #c3c8ff; }
+
+

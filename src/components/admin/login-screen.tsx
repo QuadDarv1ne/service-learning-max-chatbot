@@ -28,7 +28,7 @@ export function LoginScreen({ onSuccess }: { onSuccess: () => void }) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-background via-background to-accent">
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="space-y-3 text-center">
           <div className="flex justify-center">
@@ -39,7 +39,7 @@ export function LoginScreen({ onSuccess }: { onSuccess: () => void }) {
           <div>
             <CardTitle className="text-2xl">Чат-бот MAX</CardTitle>
             <CardDescription className="text-base">
-              Программа «Обучение служением. Первые»
+              Программа "Обучение служением. Первые"
             </CardDescription>
           </div>
         </CardHeader>
@@ -60,13 +60,13 @@ export function LoginScreen({ onSuccess }: { onSuccess: () => void }) {
               />
             </div>
             {error && (
-              <div className="rounded-md bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700">
+              <div className="rounded-md bg-destructive/10 border border-destructive/30 px-3 py-2 text-sm text-destructive">
                 {error}
               </div>
             )}
-            <div className="rounded-md bg-blue-50 border border-blue-200 px-3 py-2 text-xs text-blue-800">
-              <strong>Демо-доступ:</strong> пароль по умолчанию — <code className="font-mono bg-white px-1 rounded">admin123</code>.
-              В продакшене задайте переменную окружения <code className="font-mono bg-white px-1 rounded">ADMIN_PASSWORD</code>.
+            <div className="rounded-md bg-accent border border-border px-3 py-2 text-xs text-accent-foreground">
+              <strong>Демо-доступ:</strong> пароль по умолчанию — <code className="font-mono bg-background px-1 rounded">admin123</code>.
+              В продакшене задайте переменную окружения <code className="font-mono bg-background px-1 rounded">ADMIN_PASSWORD</code>.
             </div>
           </CardContent>
           <CardFooter>
