@@ -55,7 +55,7 @@ export async function PUT(req: Request, { params }: Params) {
     await logAdmin({
       action: 'tag_update',
       resource: id,
-      detail: `Обновлён тег «${updated.name}»`,
+      detail: `Обновлён тег "${updated.name}"`,
     })
     return NextResponse.json({ tag: updated })
   } catch (e) {
@@ -83,7 +83,7 @@ export async function DELETE(_req: Request, { params }: Params) {
     await logAdmin({
       action: 'tag_delete',
       resource: id,
-      detail: `Удалён тег «${existing?.name ?? id}»`,
+      detail: `Удалён тег "${existing?.name ?? id}"`,
     })
     return NextResponse.json({ ok: true })
   } catch (e) {

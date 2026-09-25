@@ -174,7 +174,7 @@ export function FaqsView() {
   }
 
   async function handleDelete(f: Faq) {
-    if (!confirm(`Удалить вопрос «${f.question}»?`)) return
+    if (!confirm(`Удалить вопрос "${f.question}"?`)) return
     try {
       await api.del(`/api/faqs/${f.id}`)
       toast.success('Ответ удалён')
@@ -267,7 +267,7 @@ export function FaqsView() {
       {categories.length === 0 && (
         <Card>
           <CardContent className="p-6 text-center text-sm text-muted-foreground">
-            Сначала создайте хотя бы одну категорию в разделе «Категории».
+            Сначала создайте хотя бы одну категорию в разделе "Категории".
           </CardContent>
         </Card>
       )}
@@ -483,7 +483,7 @@ export function FaqsView() {
               />
               <p className="text-xs text-muted-foreground">
                 Текст можно разбивать на абзацы через пустую строку. Поддерживаются простые символы:
-                «•», «-», «1.» для списков.
+                "•", "-", "1." для списков.
               </p>
             </div>
 
@@ -528,7 +528,7 @@ export function FaqsView() {
                   })}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Теги — это многомерная категоризация (например: «срочно», «для педагогов», «для студентов»).
+                  Теги — это многомерная категоризация (например: "срочно", "для педагогов", "для студентов").
                   Нажмите, чтобы назначить/снять.
                 </p>
               </div>

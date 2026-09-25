@@ -63,7 +63,7 @@ export async function PUT(req: Request, { params }: Params) {
     await logAdmin({
       action: 'category_update',
       resource: id,
-      detail: `Обновлена категория «${updated.title}»`,
+      detail: `Обновлена категория "${updated.title}"`,
     })
     return NextResponse.json({ category: updated })
   } catch (e) {
@@ -93,7 +93,7 @@ export async function DELETE(_req: Request, { params }: Params) {
     await logAdmin({
       action: 'category_delete',
       resource: id,
-      detail: `Удалена категория «${existing?.title ?? id}»`,
+      detail: `Удалена категория "${existing?.title ?? id}"`,
     })
     return NextResponse.json({ ok: true })
   } catch (e) {

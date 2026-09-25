@@ -126,7 +126,7 @@ export function CategoriesView() {
   }
 
   async function handleDelete(c: Category) {
-    if (!confirm(`Удалить категорию «${c.title}»? Все ${c.itemCount} ответов в ней будут удалены безвозвратно.`)) {
+    if (!confirm(`Удалить категорию "${c.title}"? Все ${c.itemCount} ответов в ней будут удалены безвозвратно.`)) {
       return
     }
     try {

@@ -67,7 +67,7 @@ export async function POST(req: Request) {
     await logAdmin({
       action: 'tag_create',
       resource: tag.id,
-      detail: `Создан тег «${tag.name}»`,
+      detail: `Создан тег "${tag.name}"`,
     })
     return NextResponse.json({ tag })
   } catch (e) {

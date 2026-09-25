@@ -63,7 +63,7 @@ export async function POST(req: Request) {
     await logAdmin({
       action: 'category_create',
       resource: cat.id,
-      detail: `Создана категория «${cat.title}»`,
+      detail: `Создана категория "${cat.title}"`,
     })
     return NextResponse.json({ category: cat })
   } catch (e) {

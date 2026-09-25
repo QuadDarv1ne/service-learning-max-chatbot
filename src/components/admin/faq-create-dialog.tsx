@@ -170,7 +170,7 @@ export function FaqCreateDialog({
             />
             <p className="text-xs text-muted-foreground">
               Текст можно разбивать на абзацы через пустую строку. Поддерживаются простые символы:
-              «•», «-», «1.» для списков.
+              "•", "-", "1." для списков.
             </p>
           </div>
 

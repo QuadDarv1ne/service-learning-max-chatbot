@@ -226,7 +226,7 @@ export default function Home() {
             <div>
               <div className="text-sm font-semibold leading-tight">Чат-бот MAX</div>
               <div className="text-xs text-muted-foreground leading-tight">
-                «Обучение служением. Первые»
+                "Обучение служением. Первые"
               </div>
             </div>
           </div>

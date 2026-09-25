@@ -209,7 +209,7 @@ async function handleBotStarted(update: MaxUpdate) {
 
   const welcome = await getSetting(
     'welcomeMessage',
-    'Здравствуйте! Я бот-помощник программы «Обучение служением. Первые».',
+    'Здравствуйте! Я бот-помощник программы "Обучение служением. Первые".',
   )
 
   await logMessage({
@@ -281,12 +281,12 @@ async function handleCallback(update: MaxUpdate) {
     await setUserState(user.user_id, null)
   } else if (payload === 'search') {
     responseText =
-      '🔍 Режим поиска активирован.\n\nНапишите ключевые слова вашего вопроса текстом — например, «как зарегистрироваться» или «документы для участия». Я подберу наиболее подходящие ответы.'
+      '🔍 Режим поиска активирован.\n\nНапишите ключевые слова вашего вопроса текстом — например, "как зарегистрироваться" или "документы для участия". Я подберу наиболее подходящие ответы.'
     keyboard = getHomeKeyboard()
     await setUserState(user.user_id, 'search')
   } else if (payload === 'contact_human') {
     responseText =
-      '✉️ Для обращения к федеральной команде программы используйте:\n\n• Эл. почта: info@dobro.ru (в теме письма укажите «Обучение служением»)\n• Форму обратной связи на платформе Добро.рф\n\nСрок ответа: до 3 рабочих дней.'
+      '✉️ Для обращения к федеральной команде программы используйте:\n\n• Эл. почта: info@dobro.ru (в теме письма укажите "Обучение служением")\n• Форму обратной связи на платформе Добро.рф\n\nСрок ответа: до 3 рабочих дней.'
     keyboard = getHomeKeyboard()
     await setUserState(user.user_id, null)
   } else if (payload.startsWith('feedback:')) {
@@ -431,10 +431,10 @@ async function handleTextMessage(update: MaxUpdate) {
             } else {
               const results = await searchFaq(args)
               if (results.length === 0) {
-                responseText = `🔎 По запросу «${args}» ничего не нашёл в базе знаний.\n\nПопробуйте переформулировать или используйте /menu для просмотра разделов.`
+                responseText = `🔎 По запросу "${args}" ничего не нашёл в базе знаний.\n\nПопробуйте переформулировать или используйте /menu для просмотра разделов.`
                 keyboard = getHomeKeyboard()
               } else {
-                responseText = `🔎 По запросу «${args}» нашёл ${results.length} ${results.length === 1 ? 'ответ' : results.length < 5 ? 'ответа' : 'ответов'}:\n\nВыберите подходящий:`
+                responseText = `🔎 По запросу "${args}" нашёл ${results.length} ${results.length === 1 ? 'ответ' : results.length < 5 ? 'ответа' : 'ответов'}:\n\nВыберите подходящий:`
                 keyboard = getFaqItemsKeyboard(
                   results.map((r) => ({ id: r.id, question: r.question, pinned: r.pinned })),
                 )
@@ -451,7 +451,7 @@ async function handleTextMessage(update: MaxUpdate) {
                 include: { category: true },
               })
               if (!item || !item.published) {
-                responseText = `❌ Ответ с ID «${args}» не найден.\n\nИспользуйте /menu для просмотра разделов или /search для поиска.`
+                responseText = `❌ Ответ с ID "${args}" не найден.\n\nИспользуйте /menu для просмотра разделов или /search для поиска.`
                 keyboard = getHomeKeyboard()
               } else {
                 responseText = `❓ ${item.question}\n\n${item.answer}`
@@ -641,8 +641,8 @@ async function handleTextMessage(update: MaxUpdate) {
 
     // Either off-topic or LLM is disabled — show standard fallback
     const notFound = programmeRelated
-      ? 'К сожалению, не нашёл точного ответа в базе знаний. 🤔\n\nПопробуйте:\n• Переформулировать вопрос\n• Воспользоваться кнопкой «🏠 Главное меню» для навигации по разделам\n• Связаться с федеральной командой через info@dobro.ru (тема «Обучение служением»)'
-      : 'Я — бот-помощник по просветительской программе «Обучение служением. Первые» и могу отвечать только на вопросы, связанные с программой. 🎓\n\nЕсли у вас вопрос по программе — задайте его иначе или воспользуйтесь кнопкой «🏠 Главное меню».'
+      ? 'К сожалению, не нашёл точного ответа в базе знаний. 🤔\n\nПопробуйте:\n• Переформулировать вопрос\n• Воспользоваться кнопкой "🏠 Главное меню" для навигации по разделам\n• Связаться с федеральной командой через info@dobro.ru (тема "Обучение служением")'
+      : 'Я — бот-помощник по просветительской программе "Обучение служением. Первые" и могу отвечать только на вопросы, связанные с программой. 🎓\n\nЕсли у вас вопрос по программе — задайте его иначе или воспользуйтесь кнопкой "🏠 Главное меню".'
 
     const keyboard = getHomeKeyboard()
     const sendRes = await sendToMax(chat.chat_id, notFound, keyboard)

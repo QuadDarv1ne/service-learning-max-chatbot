@@ -78,7 +78,7 @@ export function DashboardView() {
       <div>
         <h2 className="text-2xl font-semibold tracking-tight">Дашборд</h2>
         <p className="text-sm text-muted-foreground">
-          Сводная статистика по работе чат-бота программы «Обучение служением. Первые».
+          Сводная статистика по работе чат-бота программы "Обучение служением. Первые".
         </p>
       </div>
 

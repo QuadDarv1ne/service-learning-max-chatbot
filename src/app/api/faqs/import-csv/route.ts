@@ -153,7 +153,7 @@ export async function POST(req: Request) {
     const categoryId = catMap.get(row.category_slug)
     if (!categoryId) {
       skipped++
-      errors.push(`Строка ${i + 2}: категория с slug «${row.category_slug}» не найдена`)
+      errors.push(`Строка ${i + 2}: категория с slug "${row.category_slug}" не найдена`)
       continue
     }
 
