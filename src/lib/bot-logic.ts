@@ -16,6 +16,9 @@ import {
 } from '@/lib/max-api'
 import { generateSmartReply, isProgrammeRelated } from '@/lib/llm'
 
+// Re-export for consumers (e.g. webhook route)
+export type { MaxUpdate }
+
 type MessageSource =
   | 'system'
   | 'command'
@@ -102,7 +105,7 @@ async function sendToMax(
     text,
     keyboard,
     format: format === 'html' ? 'html' : undefined,
-  } as { chat_id: number; text: string; keyboard?: MaxKeyboard; format?: string })
+  })
   return { ok: res.ok, status: res.status, error: res.error }
 }
 
