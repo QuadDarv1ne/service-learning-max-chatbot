@@ -139,7 +139,7 @@ curl http://localhost:3000/api/health
   "categories": [
     {
       "id": "cmufn2bxz000bpmysbq7ccufc",
-      "title": "О программе «Обучение служением. Первые»",
+      "title": "О программе \"Обучение служением. Первые\"",
       "slug": "about-programme",
       "description": "Общие сведения о просветительской программе...",
       "order": 0,
@@ -208,8 +208,8 @@ curl -b cookies.txt -X DELETE http://localhost:3000/api/categories/abc123
     {
       "id": "cmufn2bxz000dpmys54g3wzvq",
       "categoryId": "abc123",
-      "question": "Что такое программа «Обучение служением. Первые»?",
-      "answer": "«Обучение служением. Первые» — это...",
+      "question": "Что такое программа \"Обучение служением. Первые\"?",
+      "answer": "\"Обучение служением. Первые\" — это...",
       "keywords": "программа, обучение служением, ...",
       "order": 0,
       "published": true,
@@ -229,7 +229,7 @@ curl -b cookies.txt -X DELETE http://localhost:3000/api/categories/abc123
 {
   "categoryId": "abc123",
   "question": "Как получить грант на проект?",
-  "answer": "Гранты на проекты программы «Обучение служением» предоставляются через...",
+  "answer": "Гранты на проекты программы \"Обучение служением\" предоставляются через...",
   "keywords": "грант, финансирование, деньги, спонсорство",
   "published": true
 }
@@ -432,7 +432,7 @@ curl -b cookies.txt "http://localhost:3000/api/analytics?period=30d&groupBy=day"
       "id": "cmuf...",
       "action": "category_create",
       "resource": "cmufn2bxz000bpmysbq7ccufc",
-      "detail": "Создана категория «Финансирование»",
+      "detail": "Создана категория \"Финансирование\"",
       "ipHash": "eff8e7ca506627fe",
       "userAgent": "Mozilla/5.0...",
       "ok": true,
