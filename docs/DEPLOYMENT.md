@@ -1,0 +1,466 @@
+# 🚀 Разворачивание
+
+Версия 1.3 · Полное руководство по установке и настройке
+
+## Содержание
+
+- [Требования](#требования)
+- [Локальный запуск (для разработки)](#локальный-запуск-для-разработки)
+- [Подключение к реальному боту MAX](#подключение-к-реальному-боту-max)
+- [Продакшен-деплой](#продакшен-деплой)
+- [Переменные окружения](#переменные-окружения)
+- [Бэкап и восстановление](#бэкап-и-восстановление)
+- [Обновление версии](#обновление-версии)
+
+---
+
+## Требования
+
+### Системные
+- **Node.js** 18+ или **Bun** 1.0+ (рекомендуется)
+- **ОЗУ**: минимум 256 MB (для dev), 512 MB (для продакшена)
+- **Диск**: 100 MB под приложение + растёт с объёмом логов (SQLite)
+- **ОС**: Linux, macOS, Windows (тестировалось на Linux)
+
+### Внешние сервисы
+- **MAX Bot API** — `https://platform-api2.max.ru/` (доступен из интернета)
+- **z-ai-web-dev-sdk** — встроен в проект (для LLM-фолбэка)
+- **HTTPS-домен** для webhook (MAX не принимает HTTP с мая 2025)
+
+### Для регистрации бота в MAX
+- Профиль **организации, ИП или самозанятого** на платформе MAX для партнёров
+- **Резидент РФ**
+- Логотип 500×500 px, < 5 MB
+- Дождаться модерации (до 48 рабочих часов)
+
+---
+
+## Локальный запуск (для разработки)
+
+### Шаг 1. Установить зависимости проекта
+
+```bash
+# Если используете bun (рекомендуется)
+bun install
+
+# Или npm
+npm install
+
+# Или yarn
+yarn install
+```
+
+### Шаг 2. Извлечь архив (если разворачиваете из tar.gz)
+
+```bash
+tar -xzf max-chatbot-v1.3.tar.gz
+cd max-chatbot
+```
+
+### Шаг 3. Настроить переменные окружения
+
+Откройте `.env` (создаётся при разворачивании, иначе скопируйте из примера ниже):
+
+```bash
+# Путь к SQLite базе (по умолчанию в db/custom.db)
+DATABASE_URL=file:/home/z/my-project/db/custom.db
+
+# Пароль админ-панели — смените в продакшене!
+ADMIN_PASSWORD=admin123
+
+# Опционально: токен бота можно задать через UI вместо env
+# MAX_BOT_TOKEN=
+```
+
+⚠️ **Важно**: `ADMIN_PASSWORD=admin123` — это демо-пароль. В продакшене задайте сложный пароль (минимум 12 символов).
+
+### Шаг 4. Применить схему базы данных
+
+```bash
+bun run db:push
+```
+
+Это создаст SQLite базу в `db/custom.db` со всеми 6 таблицами:
+- `Category`, `FaqItem`, `MaxUser`, `MessageLog`, `BotSetting`, `AdminActionLog`
+
+### Шаг 5. Заполнить базу знаний начальными данными
+
+```bash
+bun run scripts/seed.ts
+```
+
+Создаст:
+- **6 категорий**: О программе, Регистрация, Документы, Платформы, Социальные проекты, Контакты
+- **23 типовых вопроса** с ответами и ключевыми словами
+- **Настройки по умолчанию**: тексты приветствия/справки, llmEnabled=true
+
+### Шаг 6. Запустить dev-сервер
+
+```bash
+bun run dev
+```
+
+Откройте http://localhost:3000 в браузере.
+
+### Шаг 7. Войти в админ-панель
+
+- Пароль: `admin123` (если не меняли в `.env`)
+- После входа вы увидите **Дашборд** с метриками
+
+### Шаг 8. Проверить health endpoint
+
+```bash
+curl http://localhost:3000/api/health
+```
+
+Должен вернуть JSON со статусом `"ok": false` (токен не настроен), но `database.ok: true`, `knowledgeBase` с 6 категориями и 23 ответами.
+
+---
+
+## Подключение к реальному боту MAX
+
+### Шаг 1. Зарегистрировать профиль на платформе MAX для партнёров
+
+1. Перейдите на [max.ru](https://max.ru/)
+2. Нажмите «Стать партнёром»
+3. Заполните данные организации / ИП / самозанятого
+4. Верифицируйте профиль (потребуется ИНН и другие документы)
+5. Дождитесь модерации профиля
+
+### Шаг 2. Создать чат-бота
+
+1. В личном кабинете платформы MAX для партнёров откройте раздел «Чат-боты»
+2. Нажмите **«Создать»**
+3. Заполните карточку:
+   - **Логотип** — 500×500 px, .jpg/.jpeg/.png, до 5 MB
+   - **Название чат-бота** — 1–59 символов, латиница/кириллица/цифры (без emoji)
+   - **Никнейм** — генерируется автоматически (например, `idИНН_bot`)
+   - **Описание** — до 200 символов, краткое описание функций бота
+4. Нажмите **«Создать»**
+
+Никнейм бота нельзя изменить после создания.
+
+### Шаг 3. Дождаться модерации
+
+- Статус «На модерации» → проверка занимает до 48 рабочих часов
+- Статус «Опубликован» → бот доступен пользователям в MAX
+- Статус «Нужны исправления» → внесите правки и отправьте повторно
+
+Уведомления о статусе приходят от бота `MAX для бизнеса`.
+
+### Шаг 4. Получить токен бота
+
+После успешной модерации:
+1. Откройте карточку бота на платформе
+2. Раздел «⋮» → «Настройки»
+3. Скопируйте **токен бота**
+
+⚠️ **Не разглашайте токен!** Он даёт полный доступ к управлению ботом.
+
+### Шаг 5. Настроить webhook URL
+
+Ваше приложение должно быть доступно по HTTPS. Для разработки можно использовать:
+- [ngrok](https://ngrok.com/) — `ngrok http 3000`
+- [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/tunnel-guide/) — `cloudflared tunnel --url http://localhost:3000`
+
+URL вебхука должен быть вида: `https://your-domain.ru/api/max/webhook`
+
+### Шаг 6. Внести настройки в админ-панель
+
+1. Откройте админ-панель вашего приложения (http://localhost:3000)
+2. Раздел **«Настройки»**
+3. Вставьте **токен бота** в поле «Токен бота»
+4. Вставьте **URL вебхука** в поле «URL вебхука» (например, `https://abc123.ngrok.io/api/max/webhook`)
+5. Нажмите **«Сохранить настройки»**
+6. Нажмите **«Подписать webhook»** — статус сменится на «Подписка активна»
+7. Нажмите **«Проверить бота»** — должно показать имя и ID бота
+8. (Опционально) Нажмите **«Регистрация команд»** — команды `/start` и `/help` появятся в автодополнении MAX
+
+### Шаг 7. Протестировать
+
+1. Откройте мессенджер MAX (приложение или веб-версия)
+2. Найдите бота по никнейму (например, `@idИНН_bot`)
+3. Нажмите «Начать диалог»
+4. Отправьте `/start` — бот должен ответить приветствием с inline-кнопками категорий
+5. Нажмите на категорию → увидите список вопросов
+6. Нажмите на вопрос → увидите ответ
+7. Напишите текстовый запрос (например, «как зарегистрироваться») — бот найдёт релевантные ответы
+
+### Шаг 8. Мониторинг
+
+- Раздел **«Дашборд»** — общая статистика
+- Раздел **«Аналитика»** — воронка, метрики, графики
+- Раздел **«Логи обращений»** — все входящие/исходящие сообщения
+- Раздел **«Журнал действий»** — кто и что менял в админке
+- Раздел **«Настройки»** → карточка «Здоровье системы» — быстрый статус интеграции
+
+Также можно настроить uptime-мониторинг на endpoint `/api/health` (без авторизации):
+```
+curl https://your-domain.ru/api/health
+```
+
+---
+
+## Продакшен-деплой
+
+### Вариант 1: Запуск на VPS (рекомендуется)
+
+#### 1. Подготовить сервер
+
+- Linux (Ubuntu 22.04+ или Debian 12+)
+- 512 MB RAM минимум
+- Установленный Bun или Node.js 18+
+- Nginx/Caddy для HTTPS-termination (или использовать [Caddy](https://caddyserver.com/) с автосертификатами Let's Encrypt)
+
+#### 2. Установить Caddy (для HTTPS)
+
+```bash
+sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https curl
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
+sudo apt update
+sudo apt install -y caddy
+```
+
+#### 3. Настроить Caddyfile
+
+```caddyfile
+your-domain.ru {
+    reverse_proxy localhost:3000
+}
+```
+
+Caddy автоматически получит SSL-сертификат от Let's Encrypt.
+
+#### 4. Установить проект
+
+```bash
+sudo mkdir -p /opt/max-bot
+sudo chown $USER:$USER /opt/max-bot
+cd /opt/max-bot
+
+# Скопировать архив (или склонировать из git)
+scp max-chatbot-v1.3.tar.gz user@server:/opt/max-bot/
+tar -xzf max-chatbot-v1.3.tar.gz --strip-components=1
+
+# Установить зависимости
+bun install --production
+
+# Настроить env
+cp .env .env.production
+nano .env.production
+# Изменить: ADMIN_PASSWORD=сложный-пароль-12+символов
+# DATABASE_URL=file:/opt/max-bot/data/custom.db (вне исходников, для безопасности)
+
+# Создать директорию для БД
+mkdir -p data
+bun run db:push
+bun run scripts/seed.ts
+
+# Запустить (через systemd или pm2)
+```
+
+#### 5. Создать systemd-сервис
+
+`/etc/systemd/system/max-bot.service`:
+
+```ini
+[Unit]
+Description=MAX Chat Bot — Обучение служением
+After=network.target
+
+[Service]
+Type=simple
+User=maxbot
+WorkingDirectory=/opt/max-bot
+EnvironmentFile=/opt/max-bot/.env.production
+ExecStart=/home/maxbot/.bun/bin/bun run start
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable max-bot
+sudo systemctl start max-bot
+sudo systemctl status max-bot
+```
+
+#### 6. Проверить
+
+```bash
+curl https://your-domain.ru/api/health
+```
+
+### Вариант 2: Docker (если предпочитаете контейнеры)
+
+`Dockerfile`:
+
+```dockerfile
+FROM oven/bun:1 AS base
+WORKDIR /app
+
+# Установить зависимости
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile --production
+
+# Скопировать исходники
+COPY . .
+
+# База данных и seed
+RUN mkdir -p /app/data
+ENV DATABASE_URL=file:/app/data/custom.db
+RUN bun run db:push
+
+EXPOSE 3000
+CMD ["bun", "run", "start"]
+```
+
+`docker-compose.yml`:
+
+```yaml
+version: '3.8'
+services:
+  max-bot:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - DATABASE_URL=file:/app/data/custom.db
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+```
+
+Запуск:
+```bash
+ADMIN_PASSWORD=your-strong-password docker-compose up -d
+```
+
+### Вариант 3: Vercel / Netlify (serverless)
+
+⚠️ **Не рекомендуется** — SQLite не работает в serverless. Нужно мигрировать на PostgreSQL или external SQLite (Turso, Cloudflare D1).
+
+См. раздел [«Развитие архитектуры»](./ARCHITECTURE.md#развитие-архитектуры-если-нужно-масштабировать).
+
+---
+
+## Переменные окружения
+
+| Переменная | Обязательная | По умолчанию | Назначение |
+|------------|--------------|--------------|------------|
+| `DATABASE_URL` | Да | `file:./db/custom.db` | Путь к SQLite базе в формате Prisma |
+| `ADMIN_PASSWORD` | Да | `admin123` | Пароль для входа в админ-панель. **Сменить в продакшене!** |
+| `MAX_BOT_TOKEN` | Нет | (пусто) | Токен MAX Bot API. Можно задать через UI настроек вместо env |
+| `PORT` | Нет | 3000 | Порт для HTTP-сервера |
+| `NODE_ENV` | Нет | `development` | `production` для продакшена |
+
+### Пример продакшен .env
+
+```bash
+DATABASE_URL=file:/opt/max-bot/data/custom.db
+ADMIN_PASSWORD=Xy7$mB2nQ9!pL4vR
+NODE_ENV=production
+PORT=3000
+```
+
+---
+
+## Бэкап и восстановление
+
+### Бэкап базы знаний (JSON)
+
+Через админ-панель:
+1. Раздел «Настройки»
+2. Карточка «Бэкап и расширенные действия»
+3. Кнопка **«Экспорт базы знаний»**
+4. Файл скачается как `max-bot-knowledge-YYYY-MM-DD.json`
+
+Содержимое JSON:
+- Все категории с описаниями
+- Все FAQ с вопросами, ответами, ключевыми словами
+- Настройки `welcomeMessage`, `helpMessage`, `llmEnabled` (без токена!)
+
+⚠️ Токен бота **не экспортируется** — в целях безопасности.
+
+### Восстановление из бэкапа
+
+1. Раздел «Настройки» → «Бэкап и расширенные действия»
+2. Кнопка **«Импорт базы знаний»**
+3. Выберите JSON-файл
+4. Подтвердите — **текущая база будет полностью заменена**
+
+⚠️ Сделайте резервную копию перед импортом. Импорт — атомарная транзакция (либо все данные, либо ничего).
+
+### Бэкап всей БД (SQLite)
+
+```bash
+# Остановить сервис
+sudo systemctl stop max-bot
+
+# Скопировать файл БД
+cp /opt/max-bot/data/custom.db /backup/custom-$(date +%Y%m%d).db
+
+# Запустить сервис
+sudo systemctl start max-bot
+```
+
+Или через cron (ежедневный бэкап в 3:00):
+```cron
+0 3 * * * cp /opt/max-bot/data/custom.db /backup/custom-$(date +\%Y\%m\%d).db
+```
+
+### Экспорт логов в CSV
+
+В разделе **«Логи обращений»** — кнопка «Экспортировать в CSV» с текущими фильтрами. Колонки: timestamp, direction, message_type, source, duration_ms, llm_ok, max_api_status, max_user_id, user_first_name, user_last_name, user_username, text, search_text, callback_payload, matched_faq_id.
+
+### Экспорт журнала admin-действий в CSV
+
+В разделе **«Журнал действий»** — кнопка «CSV». Колонки: timestamp, action, ok, resource, detail, error, ip_hash, user_agent.
+
+---
+
+## Обновление версии
+
+### Обновление до новой версии проекта
+
+1. **Сделать бэкап** базы знаний (см. выше)
+2. Остановить сервис: `sudo systemctl stop max-bot`
+3. Распаковать новый архив поверх старого (или git pull)
+4. Установить зависимости: `bun install`
+5. Применить схему БД (миграции применятся автоматически): `bun run db:push`
+6. Если есть новые seed-данные — `bun run scripts/seed.ts` (внимание: **перезапишет** базу знаний!)
+7. Запустить сервис: `sudo systemctl start max-bot`
+8. Проверить health: `curl https://your-domain.ru/api/health`
+
+### Если были breaking changes в схеме
+
+Prisma спросит подтверждение на потерю данных. Сначала восстановите из бэкапа:
+
+```bash
+# Восстановить базу знаний из JSON
+bun run scripts/seed.ts  # сбросить
+# Затем через UI: Импорт базы знаний → выбрать ранее сохранённый JSON
+```
+
+---
+
+## Что дальше
+
+- [API Reference](./API_REFERENCE.md) — все endpoints с примерами
+- [Руководство администратора](./ADMIN_GUIDE.md) — как управлять системой
+- [Руководство сотрудника](./STAFF_GUIDE.md) — как наполнять базу знаний
+- [Решение проблем](./TROUBLESHOOTING.md) — частые проблемы
+
+---
+
+## Контакты
+
+При проблемах с разворачиванием:
+- Email: info@dobro.ru (в теме укажите «Обучение служением»)
+- [Документация MAX](https://dev.max.ru/docs)
+- [FAQ по платформе MAX для партнёров](https://max.ru/business)

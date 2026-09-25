@@ -1,0 +1,131 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+/* MAX brand palette — from max.ru CSS variables:
+   --static-colors-blue: #007aff (primary brand blue)
+   --sign-primary: #272727 (main text)
+   --sign-secondary: #49494b (secondary text)
+   --sign-tertiary: #8b8b8b (tertiary text)
+   --backgrounds-ground: #f8f8f8 (page background)
+   --backgrounds-object-primary: #ebebeb (object background)
+   Brand gradient: #630eff → #3838ff (purple → blue, used in animations)
+*/
+:root {
+  --radius: 0.625rem;
+  --background: #f8f8f8;
+  --foreground: #272727;
+  --card: #ffffff;
+  --card-foreground: #272727;
+  --popover: #ffffff;
+  --popover-foreground: #272727;
+  --primary: #007aff;
+  --primary-foreground: #ffffff;
+  --secondary: #ebebeb;
+  --secondary-foreground: #272727;
+  --muted: #ebebeb;
+  --muted-foreground: #8b8b8b;
+  --accent: #ebebeb;
+  --accent-foreground: #272727;
+  --destructive: #ff3b30;
+  --border: #e0e0e0;
+  --input: #e0e0e0;
+  --ring: #007aff;
+  --chart-1: #007aff;
+  --chart-2: #630eff;
+  --chart-3: #3838ff;
+  --chart-4: #aa4cff;
+  --chart-5: #3a89fb;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #272727;
+  --sidebar-primary: #007aff;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f0f6ff;
+  --sidebar-accent-foreground: #007aff;
+  --sidebar-border: #e0e0e0;
+  --sidebar-ring: #007aff;
+}
+
+.dark {
+  --background: #0d0d0d;
+  --foreground: #f8f8f8;
+  --card: #1a1a1a;
+  --card-foreground: #f8f8f8;
+  --popover: #1a1a1a;
+  --popover-foreground: #f8f8f8;
+  --primary: #007aff;
+  --primary-foreground: #ffffff;
+  --secondary: #2a2a2a;
+  --secondary-foreground: #f8f8f8;
+  --muted: #2a2a2a;
+  --muted-foreground: #8b8b8b;
+  --accent: #2a2a2a;
+  --accent-foreground: #f8f8f8;
+  --destructive: #ff453a;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.15);
+  --ring: #0a84ff;
+  --chart-1: #0a84ff;
+  --chart-2: #630eff;
+  --chart-3: #5e5ce6;
+  --chart-4: #bf5af2;
+  --chart-5: #5e8cff;
+  --sidebar: #1a1a1a;
+  --sidebar-foreground: #f8f8f8;
+  --sidebar-primary: #0a84ff;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #2a2a2a;
+  --sidebar-accent-foreground: #f8f8f8;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: #0a84ff;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

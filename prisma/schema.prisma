@@ -1,0 +1,183 @@
+// Prisma schema for MAX messenger chatbot
+// Programme "Обучение служением. Первые"
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Thematic FAQ sections — edited by programme staff via admin panel
+model Category {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String?
+  order       Int      @default(0)
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  items       FaqItem[]
+}
+
+// Knowledge base items — questions and approved answers
+model FaqItem {
+  id         String   @id @default(cuid())
+  categoryId String
+  question   String
+  answer     String
+  keywords   String? // comma-separated keywords for fuzzy search
+  order      Int      @default(0)
+  published  Boolean  @default(true)
+  viewCount  Int      @default(0)
+  pinned     Boolean  @default(false) // pinned items show first in lists and search
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  tags     FaqTag[]
+
+  @@index([categoryId])
+  @@index([pinned])
+}
+
+// Tags — multidimensional categorization (e.g. "urgent", "for teachers", "for students")
+model Tag {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  color     String   @default("blue") // tailwind color name: blue, red, green, amber, violet, etc.
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  faqs      FaqTag[]
+
+  @@index([name])
+}
+
+// Many-to-many between FaqItem and Tag
+model FaqTag {
+  faqId    String
+  tagId    String
+  assignedAt DateTime @default(now())
+
+  faq FaqItem @relation(fields: [faqId], references: [id], onDelete: Cascade)
+  tag Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([faqId, tagId])
+  @@index([tagId])
+}
+
+// MAX users who interact with the bot
+model MaxUser {
+  id         String   @id @default(cuid())
+  maxUserId  Int      @unique // user_id from MAX platform
+  firstName  String?
+  lastName   String?
+  username   String?
+  state      String? // current bot conversation state
+  stateData  String? // JSON-encoded state payload
+  createdAt  DateTime @default(now())
+  lastSeenAt DateTime @updatedAt
+  messages   MessageLog[]
+
+  @@index([maxUserId])
+}
+
+// Log of every message processed by the bot (incoming & outgoing)
+model MessageLog {
+  id            String   @id @default(cuid())
+  userId        String
+  maxUserId     Int
+  direction     String // 'in' | 'out'
+  messageType   String // 'text' | 'callback' | 'command' | 'system'
+  payload       String? // JSON-encoded message body
+  text          String? // quick-access text
+  matchedFaqId  String?
+  // v1.1 — richer analytics
+  source        String? // 'faq' | 'llm' | 'callback' | 'command' | 'fallback' | 'search' | 'system'
+  durationMs    Int? // time from incoming update to outgoing response
+  llmOk         Boolean? // for LLM responses: whether the model returned successfully
+  maxApiStatus  Int? // HTTP status from MAX API on send
+  maxApiError   String? // error message if MAX API failed
+  searchText    String? // when user typed a query — what they searched for
+  callbackPayload String? // when message_callback — the payload
+  createdAt     DateTime @default(now())
+
+  user MaxUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([maxUserId])
+  @@index([createdAt])
+  @@index([direction])
+  @@index([source])
+}
+
+// Bot & integration settings (key-value)
+model BotSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String?
+  updatedAt DateTime @updatedAt
+}
+
+// Custom bot commands — admin can create/edit/delete via UI
+// When user types /name in MAX, bot looks up the command here and responds
+model BotCommand {
+  id          String   @id @default(cuid())
+  name        String   @unique // e.g. "about", "contacts" — without leading slash
+  description String   // shown in MAX command autocomplete
+  type        String   // 'text' | 'faq' | 'function'
+  // type='text': response is the literal text to send
+  // type='faq': faqId points to a specific FAQ item — send that answer
+  // type='function': built-in handler (search/show/menu/help_category)
+  response    String? // for type='text'
+  faqId       String? // for type='faq'
+  format      String   @default("plain") // 'plain' | 'html' — MAX supports HTML in messages
+  enabled     Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([enabled])
+  @@index([name])
+}
+
+// Scheduled broadcasts — admin can compose messages and schedule them
+// to be sent to all users (or filtered by activity) at a specific time
+model Broadcast {
+  id          String   @id @default(cuid())
+  text        String   // message text to send
+  format      String   @default("plain") // 'plain' | 'html'
+  status      String   @default("scheduled") // 'scheduled' | 'sending' | 'sent' | 'cancelled' | 'failed'
+  scheduledAt DateTime // when to send
+  sentAt      DateTime? // actual send time
+  targetAll   Boolean  @default(true) // send to all known users
+  // future: targetByTag, targetByActivity, etc.
+  sentCount   Int      @default(0) // how many messages were sent
+  failedCount Int      @default(0) // how many failed
+  createdBy   String? // admin IP hash (for audit)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([status])
+  @@index([scheduledAt])
+}
+
+// Audit log for admin panel actions — who did what and when
+model AdminActionLog {
+  id          String   @id @default(cuid())
+  action      String   // 'login' | 'logout' | 'login_failed' | 'settings_update' | 'category_create' | 'category_update' | 'category_delete' | 'faq_create' | 'faq_update' | 'faq_delete' | 'webhook_subscribe' | 'bot_token_set' | 'test_send' | 'knowledge_import' | 'knowledge_export' | 'commands_register'
+  resource    String? // id of the affected entity, if any
+  detail      String? // short human-readable description
+  ipHash      String? // hash of the requester IP (privacy-friendly)
+  userAgent   String?
+  ok          Boolean  @default(true) // success or failure
+  error       String? // error message on failure
+  createdAt   DateTime @default(now())
+
+  @@index([action])
+  @@index([createdAt])
+}
