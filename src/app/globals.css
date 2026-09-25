@@ -1,7 +1,10 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+/* Three themes: light, dark and blue.
+   The "blue" theme is a calm deep-blue palette, so `dark:` utilities must
+   apply to it as well — that is why both .dark and .blue are listed here. */
+@custom-variant dark (&:is(.dark *, .blue *));
 
 @theme inline {
   --color-background: var(--background);
@@ -43,82 +46,120 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-/* MAX brand palette — from max.ru CSS variables:
-   --static-colors-blue: #007aff (primary brand blue)
-   --sign-primary: #272727 (main text)
-   --sign-secondary: #49494b (secondary text)
-   --sign-tertiary: #8b8b8b (tertiary text)
-   --backgrounds-ground: #f8f8f8 (page background)
-   --backgrounds-object-primary: #ebebeb (object background)
-   Brand gradient: #630eff → #3838ff (purple → blue, used in animations)
-*/
+/* ============================================================
+   Светлая тема (light) — мягкая, тёпло-нейтральная, без резкого
+   белого фона и максимального контраста: комфортна для глаз.
+   ============================================================ */
 :root {
   --radius: 0.625rem;
-  --background: #f8f8f8;
-  --foreground: #272727;
+  --background: #f5f6f8;
+  --foreground: #232830;
   --card: #ffffff;
-  --card-foreground: #272727;
+  --card-foreground: #232830;
   --popover: #ffffff;
-  --popover-foreground: #272727;
+  --popover-foreground: #232830;
   --primary: #007aff;
   --primary-foreground: #ffffff;
-  --secondary: #ebebeb;
-  --secondary-foreground: #272727;
-  --muted: #ebebeb;
-  --muted-foreground: #8b8b8b;
-  --accent: #ebebeb;
-  --accent-foreground: #272727;
-  --destructive: #ff3b30;
-  --border: #e0e0e0;
-  --input: #e0e0e0;
+  --secondary: #eef0f4;
+  --secondary-foreground: #232830;
+  --muted: #eef0f4;
+  --muted-foreground: #6b7280;
+  --accent: #e9f1fb;
+  --accent-foreground: #0b63ce;
+  --destructive: #e5484d;
+  --border: #e2e5ea;
+  --input: #e2e5ea;
   --ring: #007aff;
   --chart-1: #007aff;
   --chart-2: #630eff;
-  --chart-3: #3838ff;
-  --chart-4: #aa4cff;
-  --chart-5: #3a89fb;
+  --chart-3: #2f6bff;
+  --chart-4: #a24bff;
+  --chart-5: #2aa4c4;
   --sidebar: #ffffff;
-  --sidebar-foreground: #272727;
+  --sidebar-foreground: #232830;
   --sidebar-primary: #007aff;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f0f6ff;
-  --sidebar-accent-foreground: #007aff;
-  --sidebar-border: #e0e0e0;
+  --sidebar-accent: #eef4fd;
+  --sidebar-accent-foreground: #0b63ce;
+  --sidebar-border: #e2e5ea;
   --sidebar-ring: #007aff;
 }
 
+/* ============================================================
+   Тёмная тема (dark) — глубокий графит вместо чистого чёрного,
+   приглушённый синий акцент и мягкий контраст текста.
+   ============================================================ */
 .dark {
-  --background: #0d0d0d;
-  --foreground: #f8f8f8;
-  --card: #1a1a1a;
-  --card-foreground: #f8f8f8;
-  --popover: #1a1a1a;
-  --popover-foreground: #f8f8f8;
-  --primary: #007aff;
-  --primary-foreground: #ffffff;
-  --secondary: #2a2a2a;
-  --secondary-foreground: #f8f8f8;
-  --muted: #2a2a2a;
-  --muted-foreground: #8b8b8b;
-  --accent: #2a2a2a;
-  --accent-foreground: #f8f8f8;
-  --destructive: #ff453a;
-  --border: rgba(255, 255, 255, 0.1);
-  --input: rgba(255, 255, 255, 0.15);
-  --ring: #0a84ff;
-  --chart-1: #0a84ff;
-  --chart-2: #630eff;
-  --chart-3: #5e5ce6;
-  --chart-4: #bf5af2;
-  --chart-5: #5e8cff;
-  --sidebar: #1a1a1a;
-  --sidebar-foreground: #f8f8f8;
-  --sidebar-primary: #0a84ff;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #2a2a2a;
-  --sidebar-accent-foreground: #f8f8f8;
-  --sidebar-border: rgba(255, 255, 255, 0.1);
-  --sidebar-ring: #0a84ff;
+  --background: #14161b;
+  --foreground: #e6e8ee;
+  --card: #1b1e25;
+  --card-foreground: #e6e8ee;
+  --popover: #1b1e25;
+  --popover-foreground: #e6e8ee;
+  --primary: #3b9bff;
+  --primary-foreground: #0b1220;
+  --secondary: #262a33;
+  --secondary-foreground: #e6e8ee;
+  --muted: #262a33;
+  --muted-foreground: #9aa3b2;
+  --accent: #2a303c;
+  --accent-foreground: #cfe3ff;
+  --destructive: #ff6369;
+  --border: rgba(255, 255, 255, 0.09);
+  --input: rgba(255, 255, 255, 0.13);
+  --ring: #3b9bff;
+  --chart-1: #3b9bff;
+  --chart-2: #8b7bff;
+  --chart-3: #5e8cff;
+  --chart-4: #bf7bff;
+  --chart-5: #4fc3d9;
+  --sidebar: #171a20;
+  --sidebar-foreground: #e6e8ee;
+  --sidebar-primary: #3b9bff;
+  --sidebar-primary-foreground: #0b1220;
+  --sidebar-accent: #232833;
+  --sidebar-accent-foreground: #cfe3ff;
+  --sidebar-border: rgba(255, 255, 255, 0.09);
+  --sidebar-ring: #3b9bff;
+}
+
+/* ============================================================
+   Синяя тема (blue) — спокойная глубокая синева (navy).
+   Мягкие, десатурированные оттенки и тёплый светлый текст,
+   чтобы длительная работа не утомляла глаза.
+   ============================================================ */
+.blue {
+  --background: #0f1b2d;
+  --foreground: #dbe7f5;
+  --card: #16253c;
+  --card-foreground: #dbe7f5;
+  --popover: #16253c;
+  --popover-foreground: #dbe7f5;
+  --primary: #58a6ff;
+  --primary-foreground: #0a1526;
+  --secondary: #1e3050;
+  --secondary-foreground: #dbe7f5;
+  --muted: #1e3050;
+  --muted-foreground: #9fb4d0;
+  --accent: #223a5e;
+  --accent-foreground: #d6e6ff;
+  --destructive: #ff7a7a;
+  --border: rgba(140, 180, 240, 0.16);
+  --input: rgba(140, 180, 240, 0.2);
+  --ring: #58a6ff;
+  --chart-1: #58a6ff;
+  --chart-2: #8f7bff;
+  --chart-3: #4fd1c5;
+  --chart-4: #c58fff;
+  --chart-5: #7ec8ff;
+  --sidebar: #12213a;
+  --sidebar-foreground: #dbe7f5;
+  --sidebar-primary: #58a6ff;
+  --sidebar-primary-foreground: #0a1526;
+  --sidebar-accent: #1b2f4e;
+  --sidebar-accent-foreground: #d6e6ff;
+  --sidebar-border: rgba(140, 180, 240, 0.16);
+  --sidebar-ring: #58a6ff;
 }
 
 @layer base {
@@ -129,3 +170,4 @@
     @apply bg-background text-foreground;
   }
 }
+

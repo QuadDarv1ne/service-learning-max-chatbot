@@ -1,10 +1,22 @@
-// Theme toggle button — switches between light and dark
+// Theme switcher — light, dark and blue
 'use client'
 
 import { useEffect, useState } from 'react'
 import { useTheme } from 'next-themes'
-import { Moon, Sun } from 'lucide-react'
+import { Moon, Sun, Palette, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+
+const THEMES = [
+  { id: 'light', label: 'Светлая', icon: Sun },
+  { id: 'dark', label: 'Тёмная', icon: Moon },
+  { id: 'blue', label: 'Синяя', icon: Palette },
+] as const
 
 export function ThemeToggle() {
   const [mounted, setMounted] = useState(false)
@@ -24,18 +36,38 @@ export function ThemeToggle() {
     )
   }
 
-  const isDark = theme === 'dark'
+  const current = THEMES.find((t) => t.id === theme) ?? THEMES[0]
+  const CurrentIcon = current.icon
 
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      className="h-9 w-9"
-      onClick={() => setTheme(isDark ? 'light' : 'dark')}
-      title={isDark ? 'Переключить на светлую тему' : 'Переключить на тёмную тему'}
-      aria-label="Toggle theme"
-    >
-      {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-    </Button>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-9 w-9"
+          title={`Тема: ${current.label}`}
+          aria-label="Выбор темы оформления"
+        >
+          <CurrentIcon className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-40">
+        {THEMES.map((t) => {
+          const Icon = t.icon
+          return (
+            <DropdownMenuItem
+              key={t.id}
+              onClick={() => setTheme(t.id)}
+              className="flex items-center gap-2"
+            >
+              <Icon className="h-4 w-4" />
+              <span className="flex-1">{t.label}</span>
+              {theme === t.id && <Check className="h-4 w-4 text-primary" />}
+            </DropdownMenuItem>
+          )
+        })}
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
