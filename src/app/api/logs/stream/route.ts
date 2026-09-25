@@ -18,7 +18,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 // We need to disable Next.js response buffering for streaming
-export const maxDuration = 60 * 5 // 5 minutes max per connection
+export const maxDuration = 300 // 5 minutes max per connection
 
 export async function GET(req: NextRequest) {
   if (!(await isAuthenticated())) {
