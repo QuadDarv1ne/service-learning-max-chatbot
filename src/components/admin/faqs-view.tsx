@@ -27,7 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Plus, Pencil, Trash2, FileQuestion, Eye, Upload, Download } from 'lucide-react'
+import { Plus, Pencil, Trash2, FileQuestion, Eye, Upload, Download, Pin } from 'lucide-react'
 import { toast } from 'sonner'
 import { getTagColorClasses } from '@/lib/tag-colors'
 
@@ -336,7 +336,7 @@ export function FaqsView() {
                     <TableHead className="min-w-[300px]">Вопрос</TableHead>
                     <TableHead>Категория</TableHead>
                     <TableHead className="text-center">Просм.</TableHead>
-                    <TableHead className="text-center">📌</TableHead>
+                    <TableHead className="text-center"><Pin className="h-3.5 w-3.5 mx-auto" /></TableHead>
                     <TableHead className="text-center">Статус</TableHead>
                     <TableHead className="text-right">Действия</TableHead>
                   </TableRow>
@@ -346,7 +346,7 @@ export function FaqsView() {
                     <TableRow key={f.id}>
                       <TableCell>
                         <div className="flex items-start gap-1">
-                          {f.pinned && <span className="text-blue-600" title="Закреплён">📌</span>}
+                          {f.pinned && <span className="text-blue-600" title="Закреплён"><Pin className="h-3.5 w-3.5" /></span>}
                           <div className="font-medium line-clamp-2 flex-1">{f.question}</div>
                         </div>
                         <div className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{f.answer}</div>
@@ -385,7 +385,7 @@ export function FaqsView() {
                             }`}
                             title={f.pinned ? 'Снять закрепление' : 'Закрепить в начале списка'}
                           >
-                            📌
+<Pin className="h-3.5 w-3.5 mx-auto" />
                           </button>
                         </div>
                       </TableCell>
@@ -553,7 +553,7 @@ export function FaqsView() {
               />
               <div className="space-y-0.5">
                 <Label htmlFor="faq-pinned" className="text-sm font-medium">
-                  📌 Закрепить в начале списка
+                  <Pin className="h-3.5 w-3.5 inline" /> Закрепить в начале списка
                 </Label>
                 <p className="text-xs text-blue-800">
                   Закреплённые ответы показываются первыми в категориях и результатах поиска.

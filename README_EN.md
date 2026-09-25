@@ -39,7 +39,7 @@ User (MAX) → webhook → bot-logic → FAQ search → reply
 ### For the MAX user
 - 🔍 **Keyword search** with relevance ranking
 - 📂 **Category navigation** via inline buttons
-- 📌 **Pinned questions** — important items always on top
+- ★ **Pinned questions** — important items always on top
 - 👍 **Answer feedback** ("Helpful" / "Not helpful")
 - 🤖 **LLM fallback** for on-topic questions missing from the base
 - 💬 **Commands**: `/start`, `/help`, `/menu`, `/search <text>`, `/show <id>`, `/faq`, `/about`, `/contacts`
