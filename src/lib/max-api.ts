@@ -258,9 +258,9 @@ export function getFaqItemsKeyboard(
     if (!a.pinned && b.pinned) return 1
     return 0
   })
-  // Truncate question if too long, prepend ★ for pinned
+  // Truncate question if too long, prepend 📃 for pinned
   const rows: MaxKeyboardButton[][] = sorted.map((it) => {
-    const prefix = it.pinned ? '★ ' : ''
+    const prefix = it.pinned ? '📃 ' : ''
     const question = it.question
     const maxLen = 60 - prefix.length
     const text =
