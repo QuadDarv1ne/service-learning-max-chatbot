@@ -389,7 +389,7 @@ export function CommandsPanel() {
                   id="cmd-desc"
                   value={form.description}
                   onChange={(e) => setForm((s) => ({ ...s, description: e.target.value }))}
-                  placeholder="О программе «Обучение служением. Первые»"
+                  placeholder={'О программе "Обучение служением. Первые"'}
                   disabled={saving}
                 />
               </div>

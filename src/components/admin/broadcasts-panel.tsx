@@ -295,7 +295,7 @@ export function BroadcastsPanel() {
                   id="bc-text"
                   value={form.text}
                   onChange={(e) => setForm((s) => ({ ...s, text: e.target.value }))}
-                  placeholder="Уважаемые участники программы «Обучение служением. Первые»!..."
+                  placeholder={'Уважаемые участники программы "Обучение служением. Первые"!...'}
                   rows={8}
                   disabled={saving}
                   className="font-mono text-sm"

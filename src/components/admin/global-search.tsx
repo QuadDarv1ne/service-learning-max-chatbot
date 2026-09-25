@@ -115,7 +115,7 @@ export function GlobalSearch({ open, onOpenChange, onNavigate, onOpenUserHistory
           <CommandEmpty>Введите минимум 2 символа для поиска</CommandEmpty>
         )}
         {!loading && query.length >= 2 && !hasResults && (
-          <CommandEmpty>Ничего не найдено по запросу «{query}»</CommandEmpty>
+          <CommandEmpty>Ничего не найдено по запросу "{query}"</CommandEmpty>
         )}
 
         {results && results.categories.length > 0 && (
@@ -200,7 +200,7 @@ export function GlobalSearch({ open, onOpenChange, onNavigate, onOpenUserHistory
                 className="cursor-pointer"
               >
                 <ScrollText className="mr-2 h-4 w-4 text-sky-600" />
-                <span className="flex-1">Открыть логи с фильтром «{query}»</span>
+                <span className="flex-1">Открыть логи с фильтром "{query}"</span>
                 <ArrowRight className="h-3 w-3" />
               </CommandItem>
               <CommandItem
