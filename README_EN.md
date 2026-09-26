@@ -9,13 +9,15 @@
 
 [Русский](./README.md) · **English**
 
-A chatbot for the national **MAX** messenger that provides information support to participants of the **"Service-Learning. First"** educational programme — social task No. 4262 from the Dobro.rf Association.
+A chatbot for the national **MAX** messenger that provides information support to participants of the **"Service-Learning.
+
+First"** educational programme — social task No. 4262 from the Dobro.rf Association.
 
 ---
 
 ## 📖 About
 
-The bot helps teachers, educational organisations and regional teams quickly find answers to common questions about the programme: registration, documents, platforms, social projects and contacts.
+**The bot helps teachers, educational organisations and regional teams quickly find answers to common questions about the programme:**registration, documents, platforms, social projects and contacts.
 
 **The key requirement** was to let programme staff update the answer base **without involving developers**. This is implemented via a visual admin panel with full CRUD.
 
@@ -27,7 +29,7 @@ User (MAX) → webhook → bot-logic → FAQ search → reply
 ```
 
 1. A user messages the bot or taps an inline button.
-2. MAX delivers the event to `POST /api/max/webhook`.
+2. MAX delivers the event to `POST /api/max/webhook`
 3. The bot searches the knowledge base (text normalisation, stop-words, scoring across question/keywords/answer).
 4. If no answer exists but the question is programme-related, an LLM fallback kicks in.
 5. Everything is logged for analytics.
@@ -37,6 +39,7 @@ User (MAX) → webhook → bot-logic → FAQ search → reply
 ## ✨ Features
 
 ### For the MAX user
+
 - 🔍 **Keyword search** with relevance ranking
 - 📂 **Category navigation** via inline buttons
 - 📃 **Pinned questions** — important items always on top
@@ -45,6 +48,7 @@ User (MAX) → webhook → bot-logic → FAQ search → reply
 - 💬 **Commands**: `/start`, `/help`, `/menu`, `/search <text>`, `/show <id>`, `/faq`, `/about`, `/contacts`
 
 ### For the administrator
+
 - 📊 **Dashboard** — key daily metrics
 - 📈 **Analytics** — answer funnel, FAQ/LLM share, off-topic rate, charts
 - 🗂️ **Knowledge base (FAQ)** — CRUD for categories and answers, tags, pinning
@@ -72,9 +76,10 @@ User (MAX) → webhook → bot-logic → FAQ search → reply
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Requirements
+
 - **Bun** 1.0+ (recommended) or **Node.js** 18+
 - 256 MB RAM (dev) / 512 MB (prod)
 
@@ -201,7 +206,8 @@ Full annotated list — in [`.env.example`](./.env.example).
 - **Docker** — ready-made `Dockerfile` and `docker-compose.yml` there too
 - **Vercel/Netlify** — ⚠️ not recommended: SQLite does not work in serverless
 
-Post-deploy health check:
+**Post-deploy health check:**
+
 ```bash
 curl https://your-domain.ru/api/health
 ```
@@ -254,4 +260,6 @@ Please run `bun run lint` before committing.
 This project is distributed under a **custom license with a sharealike condition and commercial-use restrictions**. See [LICENSE](./LICENSE) (EN) and [LICENSE_RU](./LICENSE_RU) (RU).
 
 Developed within social task No. 4262 of the Dobro.rf Association.
-Programme: "Service-Learning. First" · Copyright © 2025–2026 Dupley Maxim Igorevich (QuadDarv1ne) and Maestro7IT.
+
+**Programme:** "Service-Learning. First" · Copyright © 2025–2026 Dupley Maxim Igorevich (QuadDarv1ne) and Maestro7IT
+
