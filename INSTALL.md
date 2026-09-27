@@ -57,19 +57,13 @@ ADMIN_PASSWORD=admin123
 
 ⚠️ **Смените пароль** в продакшене! Минимум 12 символов.
 
-### Шаг 4. Создать базу данных
+### Шаг 4. Создать базу данных и наполнить её
 
 ```bash
-bun run db:push
+bun run setup
 ```
 
-Это создаст SQLite базу в `db/custom.db` со всеми таблицами.
-
-### Шаг 5. Заполнить базу знаний
-
-```bash
-bun run scripts/seed.ts
-```
+Команда применяет схему Prisma (создаёт SQLite базу в `prisma/db/custom.db` со всеми таблицами), а затем наполняет базу **только если она пуста**. Повторный запуск ничего не удалит — это безопасно делать после каждого обновления.
 
 Создаст:
 - 6 категорий FAQ (О программе, Регистрация, Документы, Платформы, Социальные проекты, Контакты)
@@ -77,7 +71,9 @@ bun run scripts/seed.ts
 - 8 команд бота (/start, /help, /menu, /search, /show, /about, /contacts, /faq)
 - Настройки по умолчанию
 
-### Шаг 6. Запустить dev-сервер
+> Нужен именно полный сброс (удалить всё и залить заново)? Тогда `bun run seed` — он **удаляет** логи, пользователей и базу знаний.
+
+### Шаг 5. Запустить dev-сервер
 
 ```bash
 bun run dev
@@ -85,12 +81,12 @@ bun run dev
 
 Откройте http://localhost:3000 в браузере.
 
-### Шаг 7. Войти в админ-панель
+### Шаг 6. Войти в админ-панель
 
 - Пароль: `admin123` (если не меняли в `.env`)
 - После входа вы увидите Дашборд
 
-### Шаг 8. Проверить health endpoint
+### Шаг 7. Проверить health endpoint
 
 ```bash
 curl http://localhost:3000/api/health
@@ -154,8 +150,7 @@ PORT=3001 bun run dev
 rm db/custom.db
 
 # Пересоздать
-bun run db:push
-bun run scripts/seed.ts
+bun run setup
 
 # Запустить снова
 bun run dev
@@ -303,8 +298,7 @@ nano .env
 
 # Создать базу
 mkdir -p data
-bun run db:push
-bun run scripts/seed.ts
+bun run setup
 ```
 
 #### 4. Создать systemd-сервис
@@ -418,9 +412,13 @@ ADMIN_PASSWORD=your-strong-password docker-compose up -d
 ├── public/
 │   ├── logo.svg
 │   └── robots.txt
+├── scripts/
+│   ├── seed.ts              # Полный сброс + наполнение базы знаний
+│   ├── seed-if-empty.ts     # Наполнение только пустой базы (идемпотентно)
+│   └── autocommit.mjs       # Watcher авто-коммитов (опционально)
 ├── .env                     # DATABASE_URL, ADMIN_PASSWORD
 ├── .env.example             # Шаблон для копирования
-├── package.json             # Скрипты: dev, build, start, lint, db:push, db:generate, db:migrate, db:reset
+├── package.json             # Скрипты: dev, build, start, lint, setup, seed, db:*
 ├── bun.lock                 # Точные версии зависимостей
 ├── tsconfig.json
 ├── next.config.ts           # output: "standalone"
@@ -439,14 +437,22 @@ ADMIN_PASSWORD=your-strong-password docker-compose up -d
 
 | Скрипт | Команда | Назначение |
 |--------|---------|------------|
-| `dev` | `next dev -p 3000` | Dev-сервер с авто-reload |
+| `dev` | `next dev` | Dev-сервер с авто-reload (порт из `package.json`/`PORT`) |
+| `dev:log` | `next dev \| tee dev.log` | То же, с логом в файл (нужен `tee`) |
 | `build` | `next build` | Production-сборка в `.next/standalone/` |
 | `start` | `bun .next/standalone/server.js` | Production-сервер |
 | `lint` | `eslint .` | Проверка кода |
+| `setup` | `db push` + `seed:if-empty` | Применить схему и наполнить **пустую** базу |
+| `postinstall` | `prisma generate` | Автосгенерация клиента после `bun install` |
+| `seed` | `bun run scripts/seed.ts` | Полный сброс + наполнение (данные удаляются!) |
+| `seed:if-empty` | `bun run scripts/seed-if-empty.ts` | Наполнение только пустой базы — безопасно |
+| `autocommit` | `node scripts/autocommit.mjs` | Watcher авто-коммитов |
 | `db:push` | `prisma db push` | Применить схему к БД (без миграций) |
 | `db:generate` | `prisma generate` | Перегенерировать Prisma клиент |
 | `db:migrate` | `prisma migrate dev` | Создать миграцию |
 | `db:reset` | `prisma migrate reset` | Сбросить БД (с потерей данных) |
+
+> `bun install` сам запускает `postinstall` → генерация Prisma клиента. Поэтому на чистой машине достаточно `bun install`, затем `cp .env.example .env`, затем `bun run setup`.
 
 ---
 

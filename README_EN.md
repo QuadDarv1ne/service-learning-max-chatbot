@@ -98,12 +98,13 @@ cp .env.example .env
 # Edit .env: DATABASE_URL, ADMIN_PASSWORD
 
 # 4. Create the DB schema and seed the knowledge base
-bun run db:push
-bun run scripts/seed.ts
+bun run setup
 
 # 5. Run
 bun run dev
 ```
+
+`bun run setup` is idempotent: it applies the schema and fills the database **only if it is empty**. Existing data, logs and users are left untouched, so it is safe to re-run after every update.
 
 Open **http://localhost:3000** — the admin panel. Default password is `admin123` (**change it in `.env`!**).
 
@@ -126,15 +127,18 @@ See [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) (Russian) for details.
 | Command | Purpose |
 |---------|---------|
 | `bun run dev` | Dev server on `localhost:3000` |
+| `bun run dev:log` | Same, logging to `dev.log` (needs `tee`, Linux/macOS) |
 | `bun run build` | Production build (standalone) |
 | `bun run start` | Run the built app |
 | `bun run lint` | ESLint |
+| `bun run setup` | Apply schema + seed the DB **only if it is empty** |
 | `bun run autocommit` | Auto-commit watcher (see below) |
 | `bun run db:push` | Apply schema to the DB |
 | `bun run db:generate` | Generate Prisma Client |
 | `bun run db:migrate` | Migrations (dev) |
 | `bun run db:reset` | Reset the DB |
-| `bun run scripts/seed.ts` | Seed the knowledge base |
+| `bun run seed` | Full reset + seed the knowledge base (data is deleted) |
+| `bun run seed:if-empty` | Seed an empty DB only — safe for production |
 
 ### Auto-commit (optional)
 

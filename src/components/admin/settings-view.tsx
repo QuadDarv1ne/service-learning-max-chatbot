@@ -1,8 +1,9 @@
 // Settings view — bot config, webhook, test message, instructions
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo } from 'react'
 import { api } from '@/lib/api-client'
+import { checkWebhookUrl } from '@/lib/webhook-url'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -81,6 +82,15 @@ export function SettingsView() {
     }
   } | null>(null)
   const [healthLoading, setHealthLoading] = useState(false)
+
+  // Same rule MAX applies when subscribing: HTTPS only, public host, no query
+  // string. Checked here so the problem is visible before the API rejects it.
+  const webhookError = useMemo(() => {
+    const url = settings?.webhookUrl.trim() ?? ''
+    if (!url) return null
+    const res = checkWebhookUrl(url)
+    return res.ok ? null : res.error
+  }, [settings?.webhookUrl])
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -432,11 +442,23 @@ export function SettingsView() {
             <p className="text-xs text-muted-foreground">
               Сначала сохраните настройки, затем нажмите "Подписать webhook".
             </p>
+            {webhookError && (
+              <p className="flex items-start gap-1.5 text-xs text-destructive">
+                <XCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                {webhookError}
+              </p>
+            )}
           </div>
           <div className="flex items-center gap-3">
             <Button
               onClick={subscribeWebhook}
-              disabled={subscribing || !settings.webhookUrl || !settings.botToken || settings.botToken.includes('•')}
+              disabled={
+                subscribing ||
+                !settings.webhookUrl ||
+                !!webhookError ||
+                !settings.botToken ||
+                settings.botToken.includes('•')
+              }
             >
               {subscribing ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Webhook className="h-4 w-4" />}
               Подписать webhook

@@ -22,7 +22,7 @@
 **Если вы разворачиваете впервые:**
 1. Прочитайте [DEPLOYMENT.md](./DEPLOYMENT.md) → раздел "Локальный запуск"
 2. Установите зависимости: `bun install`
-3. Настройте базу: `bun run db:push && bun run scripts/seed.ts`
+3. Настройте базу: `bun run setup` (схема + наполнение пустой базы)
 4. Запустите: `bun run dev` → http://localhost:3000
 5. Пароль по умолчанию: `admin123` (смените в `.env`)
 
@@ -87,7 +87,8 @@
 ├── prisma/
 │   └── schema.prisma         # Схема БД
 ├── scripts/
-│   └── seed.ts               # Инициализация базы знаний
+│   ├── seed.ts               # Наполнение базы знаний (идемпотентно)
+│   └── seed-if-empty.ts      # Наполнение только пустой базы
 ├── src/
 │   ├── app/api/              # 18 API endpoints
 │   ├── components/admin/     # UI админ-панели

@@ -1,3 +1,68 @@
+# =============================================================================
+# Caddy reverse proxy for the MAX chatbot ("Обучение служением. Первые").
+#
+# MAX Bot API only accepts webhook URLs over HTTPS with a valid certificate,
+# so Caddy terminates TLS and forwards to the Next.js server on 127.0.0.1:3000.
+#
+# Usage:
+#   1. Point a DNS A/AAAA record for your domain at this server.
+#   2. Replace "bot.example.com" in the block below with that domain.
+#   3. caddy run --config Caddyfile        (or: systemctl restart caddy)
+#   4. In the admin panel (Настройки → Webhook) set the URL to
+#      https://bot.example.com/api/max/webhook
+#
+# Caddy requests and renews Let's Encrypt certificates automatically, so port
+# 443 must be reachable from the internet. Delete the whole block below while
+# running locally without a domain — the ":81" block at the bottom is enough.
+# =============================================================================
+
+bot.example.com {
+	encode zstd gzip
+
+	# Minimal hardening — the panel is password protected, no need to leak versions
+	header {
+		X-Content-Type-Options nosniff
+		X-Frame-Options SAMEORIGIN
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+
+	# Bot traffic gets its own access log so webhook debugging stays readable
+	handle /api/max/webhook {
+		reverse_proxy 127.0.0.1:3000 {
+			header_up Host {host}
+			header_up X-Real-IP {remote_host}
+			header_up X-Forwarded-For {remote_host}
+			header_up X-Forwarded-Proto {scheme}
+		}
+	}
+
+	# Everything else (admin UI, /api/*)
+	handle {
+		reverse_proxy 127.0.0.1:3000 {
+			header_up Host {host}
+			header_up X-Real-IP {remote_host}
+			header_up X-Forwarded-For {remote_host}
+			header_up X-Forwarded-Proto {scheme}
+		}
+	}
+
+	log {
+		output file /var/log/caddy/max-bot.log {
+			roll_size 10MiB
+			roll_keep 5
+		}
+	}
+}
+
+# -----------------------------------------------------------------------------
+# Localhost fallback (plain HTTP, no DNS, no TLS).
+# MAX cannot reach it — use it to open the panel from another device in your
+# LAN, or behind a tunnel such as cloudflared/ngrok.
+#
+# The XTransformPort handler lets a single Caddy front several local instances:
+#   http://localhost:81/?XTransformPort=3001  ->  127.0.0.1:3001
+# -----------------------------------------------------------------------------
 :81 {
 	@transform_port_query {
 		query XTransformPort=*

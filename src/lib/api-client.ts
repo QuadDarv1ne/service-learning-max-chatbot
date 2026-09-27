@@ -11,7 +11,11 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   })
   const data = await res.json().catch(() => ({}))
   if (!res.ok) {
-    throw new Error((data as Record<string, unknown>).error as string || `HTTP ${res.status}`)
+    // Routes return { error: <code>, detail: <human-readable> }. Prefer detail so
+    // the UI shows an actionable message instead of a bare code like "create_failed".
+    const d = data as Record<string, unknown>
+    const message = (d.detail as string) || (d.error as string) || `HTTP ${res.status}`
+    throw new Error(message)
   }
   return data as T
 }

@@ -7,11 +7,35 @@
 
 import { NextResponse } from 'next/server'
 import { processMaxUpdate, type MaxUpdate } from '@/lib/bot-logic'
+import { verifyWebhookSecret, WEBHOOK_SECRET_HEADER } from '@/lib/webhook-secret'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: Request) {
+  // The URL is public: without this check anyone could forge an update with an
+  // arbitrary user_id and make the bot act as that user.
+  const auth = verifyWebhookSecret(req.headers.get(WEBHOOK_SECRET_HEADER))
+  if (!auth.ok) {
+    // Deliberately not 200: MAX retries on non-2xx, which is what we want for a
+    // misconfiguration, and forged traffic should not look acknowledged.
+    console.error(`Webhook: rejected (${auth.reason})`)
+    const status = auth.reason === 'not_configured' ? 503 : 401
+    return NextResponse.json(
+      {
+        ok: false,
+        error: auth.reason,
+        ...(auth.reason === 'not_configured'
+          ? {
+              detail:
+                'Set MAX_WEBHOOK_SECRET in the environment and re-subscribe the webhook (see .env.example)',
+            }
+          : null),
+      },
+      { status },
+    )
+  }
+
   let body: MaxUpdate
   try {
     body = (await req.json()) as MaxUpdate

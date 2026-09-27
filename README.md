@@ -86,7 +86,7 @@
 git clone https://github.com/QuadDarv1ne/service-learning-max-chatbot.git
 cd service-learning-max-chatbot
 
-# 2. Установить зависимости
+# 2. Установить зависимости (postinstall сам сгенерирует Prisma Client)
 bun install
 
 # 3. Настроить окружение
@@ -94,12 +94,13 @@ cp .env.example .env
 # Отредактируйте .env: DATABASE_URL, ADMIN_PASSWORD
 
 # 4. Создать схему БД и заполнить базу знаний
-bun run db:push
-bun run scripts/seed.ts
+bun run setup
 
 # 5. Запустить
 bun run dev
 ```
+
+`bun run setup` идемпотентен: он применяет схему и наполняет базу **только если она пуста**. Существующие данные, логи и пользователи не трогаются, поэтому команду можно безопасно запускать после каждого обновления.
 
 Откройте **http://localhost:3000** — админ-панель. Пароль по умолчанию `admin123` (**смените его в `.env`!**).
 
@@ -122,15 +123,18 @@ bun run dev
 | Команда | Назначение |
 |---------|-----------|
 | `bun run dev` | Dev-сервер на `localhost:3000` |
+| `bun run dev:log` | То же, с логом в `dev.log` (нужен `tee`, Linux/macOS) |
 | `bun run build` | Продакшен-сборка (standalone) |
 | `bun run start` | Запуск собранного приложения |
 | `bun run lint` | ESLint |
+| `bun run setup` | Применить схему + наполнить базу, **если она пуста** |
 | `bun run autocommit` | Watcher авто-коммитов (см. ниже) |
 | `bun run db:push` | Применить схему к БД |
 | `bun run db:generate` | Сгенерировать Prisma Client |
 | `bun run db:migrate` | Миграции (dev) |
 | `bun run db:reset` | Сброс БД |
-| `bun run scripts/seed.ts` | Заполнить базу знаний |
+| `bun run seed` | Полный сброс + наполнение базы знаний (данные удаляются) |
+| `bun run seed:if-empty` | Наполнение только пустой базы — безопасно для прода |
 
 ### Авто-коммит (опционально)
 

@@ -6,6 +6,7 @@ import { db } from '@/lib/db'
 import { maxApi } from '@/lib/max-api'
 import { isAuthenticated } from '@/lib/auth'
 import { logAdmin } from '@/lib/admin-log'
+import { checkWebhookUrl } from '@/lib/webhook-url'
 
 export const runtime = 'nodejs'
 
@@ -34,14 +35,26 @@ export async function POST() {
   }
 
   const webhookRow = await db.botSetting.findUnique({ where: { key: 'webhookUrl' } })
-  const webhookUrl = webhookRow?.value
+  const storedWebhookUrl = webhookRow?.value
 
-  if (!webhookUrl) {
+  if (!storedWebhookUrl) {
     return NextResponse.json(
       { error: 'webhookUrl_not_set', detail: 'Set webhookUrl in settings first' },
       { status: 400 },
     )
   }
+
+  // The value may predate URL validation or come from an imported knowledge
+  // base, so re-check before spending a request on a subscription MAX would
+  // refuse anyway.
+  const checkedUrl = checkWebhookUrl(storedWebhookUrl)
+  if (!checkedUrl.ok) {
+    return NextResponse.json(
+      { error: 'invalid_webhook_url', detail: checkedUrl.error },
+      { status: 400 },
+    )
+  }
+  const webhookUrl = checkedUrl.normalized
 
   const tokenRow = await db.botSetting.findUnique({ where: { key: 'botToken' } })
   const token = tokenRow?.value
@@ -52,9 +65,25 @@ export async function POST() {
     )
   }
 
+  // MAX echoes this secret back in the x-max-webhook-secret header of every
+  // delivery, which is what /api/max/webhook verifies. Without it the webhook
+  // is open to anyone who learns the URL, so refuse to subscribe in production.
+  const secret = (process.env.MAX_WEBHOOK_SECRET ?? '').trim()
+  if (!secret && process.env.NODE_ENV === 'production') {
+    return NextResponse.json(
+      {
+        error: 'webhook_secret_missing',
+        detail:
+          'MAX_WEBHOOK_SECRET must be set in production before subscribing, otherwise the webhook endpoint cannot authenticate calls',
+      },
+      { status: 400 },
+    )
+  }
+
   const res = await maxApi.subscribeWebhook({
     url: webhookUrl,
     updates: DEFAULT_UPDATES,
+    ...(secret ? { secret } : null),
   })
 
   if (res.ok) {

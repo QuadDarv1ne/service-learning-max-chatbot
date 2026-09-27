@@ -1,9 +1,20 @@
 // Seed script: initial FAQ categories & items for the "Обучение служением. Первые" bot
-// Run with: bun run /home/z/my-project/scripts/seed.ts
+//
+// Two ways to use it:
+//   bun run seed            — FULL RESET: deletes all data, then seeds
+//   bun run seed:if-empty   — SAFE: seeds only when the database is empty
+//
+// The seeding logic lives in the exported seedDatabase() so that
+// scripts/seed-if-empty.ts can reuse it without re-running the reset.
 
 import { PrismaClient } from '@prisma/client'
 
-const db = new PrismaClient()
+// Create a PrismaClient only when this file is executed directly,
+// so importing seedDatabase() never opens an unused connection.
+const scriptPath = process.argv[1] || ''
+const isDirectRun = /seed\.(ts|js|mjs)$/.test(scriptPath)
+
+const db = isDirectRun ? new PrismaClient() : (null as unknown as PrismaClient)
 
 type CategorySeed = {
   title: string
@@ -195,19 +206,14 @@ const seedData: CategorySeed[] = [
   },
 ]
 
-async function main() {
-  console.log('🌱 Seeding database with FAQ data...')
-
-  // Clean existing data
-  await db.messageLog.deleteMany()
-  await db.maxUser.deleteMany()
-  await db.faqItem.deleteMany()
-  await db.category.deleteMany()
-  await db.botSetting.deleteMany()
-  await db.botCommand.deleteMany()
-
+/**
+ * Seed default settings, FAQ categories/items and bot commands.
+ * This function is NOT destructive — the caller decides whether to reset first.
+ * Exported so scripts/seed-if-empty.ts can reuse the very same data set.
+ */
+export async function seedDatabase(database: PrismaClient) {
   // Default settings
-  await db.botSetting.createMany({
+  await database.botSetting.createMany({
     data: [
       { key: 'botToken', value: '' },
       { key: 'webhookUrl', value: '' },
@@ -219,7 +225,7 @@ async function main() {
   })
 
   for (const [catIndex, cat] of seedData.entries()) {
-    const createdCat = await db.category.create({
+    const createdCat = await database.category.create({
       data: {
         title: cat.title,
         slug: cat.slug,
@@ -230,7 +236,7 @@ async function main() {
     })
 
     for (const [itemIndex, item] of cat.items.entries()) {
-      await db.faqItem.create({
+        await database.faqItem.create({
         data: {
           categoryId: createdCat.id,
           question: item.question,
@@ -301,9 +307,31 @@ async function main() {
     },
   ]
   for (const cmd of commands) {
-    await db.botCommand.create({ data: cmd })
+    await database.botCommand.create({ data: cmd })
     console.log(`  ✓ /${cmd.name}`)
   }
+}
+
+/**
+ * Full reset + seed. DESTRUCTIVE — wipes user data, logs and broadcasts.
+ * For deployments use `bun run seed:if-empty` instead.
+ */
+async function main() {
+  console.log('🌱 Seeding database with FAQ data (full reset)...')
+
+  // Clean existing data — every model, so the reset is truly complete
+  await db.messageLog.deleteMany()
+  await db.adminActionLog.deleteMany()
+  await db.broadcast.deleteMany()
+  await db.faqTag.deleteMany()
+  await db.tag.deleteMany()
+  await db.maxUser.deleteMany()
+  await db.faqItem.deleteMany()
+  await db.category.deleteMany()
+  await db.botSetting.deleteMany()
+  await db.botCommand.deleteMany()
+
+  await seedDatabase(db)
 
   const totalCats = await db.category.count()
   const totalItems = await db.faqItem.count()
@@ -311,11 +339,14 @@ async function main() {
   console.log(`\n✅ Seed complete: ${totalCats} categories, ${totalItems} FAQ items, ${totalCmds} commands`)
 }
 
-main()
-  .catch((e) => {
-    console.error('Seed failed:', e)
-    process.exit(1)
-  })
-  .finally(async () => {
-    await db.$disconnect()
-  })
+// Only auto-run when executed directly, never when imported by seed-if-empty.ts
+if (isDirectRun) {
+  main()
+    .catch((e) => {
+      console.error('Seed failed:', e)
+      process.exit(1)
+    })
+    .finally(async () => {
+      await db.$disconnect()
+    })
+}

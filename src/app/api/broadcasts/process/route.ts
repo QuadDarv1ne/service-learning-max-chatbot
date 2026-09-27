@@ -7,15 +7,18 @@ import { db } from '@/lib/db'
 import { maxApi } from '@/lib/max-api'
 import { isAuthenticated } from '@/lib/auth'
 import { logAdmin } from '@/lib/admin-log'
+import { safeCompare } from '@/lib/secret-compare'
 
 export const runtime = 'nodejs'
 
 export async function POST(req: Request) {
   // Allow calls from cron (with secret header) OR authenticated admin
   const authHeader = req.headers.get('x-cron-secret')
-  const cronSecret = process.env.CRON_SECRET
+  const cronSecret = (process.env.CRON_SECRET ?? '').trim()
 
-  if (authHeader && cronSecret && authHeader === cronSecret) {
+  // Constant-time compare: a plain === leaks the secret byte-by-byte to an
+  // attacker who can measure response times over many requests.
+  if (authHeader && cronSecret && safeCompare(authHeader, cronSecret)) {
     // Cron call — proceed
   } else if (await isAuthenticated()) {
     // Admin call — proceed

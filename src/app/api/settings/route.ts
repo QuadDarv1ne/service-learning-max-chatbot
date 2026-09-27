@@ -12,6 +12,8 @@ import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { isAuthenticated } from '@/lib/auth'
 import { logAdmin } from '@/lib/admin-log'
+import { checkWebhookUrl } from '@/lib/webhook-url'
+import { checkWebhookHost } from '@/lib/webhook-host'
 
 export const runtime = 'nodejs'
 
@@ -52,7 +54,42 @@ export async function PUT(req: Request) {
   }
 
   // Only allow known keys
-  const updates = Object.entries(body).filter(([k, v]) => ALL_KEYS.includes(k) && typeof v === 'string')
+  const updates: [string, string][] = Object.entries(body).filter(
+    ([k, v]) => ALL_KEYS.includes(k) && typeof v === 'string',
+  )
+
+  // MAX accepts webhook URLs only over HTTPS and rejects those carrying a query
+  // string, but it reports such problems with an opaque API error. Checking here
+  // gives the admin a readable reason immediately, and the normalized form
+  // (trimmed, no trailing slash) is what ends up in the database. An empty value
+  // is allowed so the setting can be cleared.
+  const webhookIdx = updates.findIndex(([k]) => k === 'webhookUrl')
+  if (webhookIdx !== -1 && updates[webhookIdx][1].trim() !== '') {
+    const checked = checkWebhookUrl(updates[webhookIdx][1])
+    if (!checked.ok) {
+      return NextResponse.json(
+        { error: 'invalid_webhook_url', detail: checked.error },
+        { status: 400 },
+      )
+    }
+    updates[webhookIdx] = ['webhookUrl', checked.normalized]
+
+    // The text checks above cannot see that a public-looking domain points at an
+    // internal address. Reject only positively identified private targets; an
+    // unresolvable host is saved anyway (DNS may be transiently unavailable).
+    const hostCheck = await checkWebhookHost(checked.normalized)
+    if (hostCheck.risk === 'private') {
+      return NextResponse.json(
+        { error: 'private_webhook_target', detail: hostCheck.detail },
+        { status: 400 },
+      )
+    }
+    if (hostCheck.risk === 'unresolved') {
+      console.warn(
+        `[settings] webhook host не резолвится (${hostCheck.detail}) — значение сохранено, проверьте DNS`,
+      )
+    }
+  }
 
   // Track which keys were actually changed for the audit log
   const changedKeys: string[] = []
