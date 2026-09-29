@@ -64,9 +64,9 @@ Thumbs.db
 .eslintcache
 
 # Archives / release bundles
-*.tar.gz
-*.tgz
-*.zip
+# *.tar.gz
+# *.tgz
+# *.zip
 
 # Stray dev-server port files (created accidentally)
 /3001
